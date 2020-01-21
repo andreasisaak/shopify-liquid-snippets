@@ -1,0 +1,7 @@
+// For debugging code and build new functions, only if admin is active
+
+{% if content_for_header contains 'adminBarInjector' %}
+   <script>
+     console.log("You're a logged in admin viewing the site!");
+   </script>
+{% endif %}
