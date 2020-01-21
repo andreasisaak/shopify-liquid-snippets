@@ -1,0 +1,59 @@
+// For this feature, you need optional custom metafields for each product and language files for the fallback settings
+
+Language file configuration:
+
+{
+  "products": {
+    "general": {
+      "delivery": "Ready for dispatch from",
+      "delivery_default": "4" // Your default processing time for the products
+    },
+  }
+}
+
+
+Metafields configuration (optional):
+
+Key: delivery
+Namespace: global
+Value type: Integer
+
+
+Example code (Work in Progress):
+
+{% assign metafields = product.metafields.global %}
+{% assign wday = "now" | date: "%a" %}
+{% assign delivery_default = 'products.general.delivery_default' | t %}
+
+  {% if metafields.delivery != blank %}
+  {% comment %} Using the metafields content and set custom delivery time {% endcomment %}
+  	{% if wday == 'Fri' %}
+		  {% assign days = metafields.delivery | plus: 2 | times: 86400 %}
+	  {% elsif wday == 'Sat' %}
+  		{% assign days = metafields.delivery | plus: 1 | times: 86400 %}
+	  {% else %}
+  		{% assign days = metafields.delivery | times: 86400 %}
+	  {% endif %}
+	  {% assign shipping_date = "now" | date: "%s" | plus: days | date: "%d.%m.%Y" %}
+  {% else %}
+  {% comment %} Using the default time from language file {% endcomment %}
+	  {% if wday == 'Fri' %}
+		  {% assign days = delivery_default | plus: 2 | times: 86400 %}
+	  {% elsif wday == 'Sat' %}
+  		{% assign days = delivery_default | plus: 1 | times: 86400 %}
+	  {% else %}
+  		{% assign days = delivery_default | times: 86400 %}
+	  {% endif %}
+	  {% assign shipping_date = "now" | date: "%s" | plus: days | date: "%d.%m.%Y" %}
+  {% endif %}
+  
+<div class="product-shipping">
+  {{ 'general.form.delivery' | t }} {{ shipping_date }}
+</div>
+  
+  
+Output in frontend:
+  
+<div class="product-shipping">
+  Ready for dispatch from 23.01.2020
+</div>
