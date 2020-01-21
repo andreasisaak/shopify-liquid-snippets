@@ -1,0 +1,52 @@
+// This recommendations based on metafields, manually maintained in the respective product
+// NO JS!
+// Metafield App is required, for example the free Metafields Guru: https://apps.shopify.com/metafields-editor-2
+
+Metafields Configuration
+
+Key: cross
+Namespace: global
+Value type: JSON
+
+Example content:
+
+{
+  "product": "handle-for-product-1",
+  "product2": "handle-for-product-2"
+}
+
+Example integration:
+
+{% assign metafields = product.metafields.global %}
+{% if metafields.cross %}
+  <div class="grid">
+  {% for crossselling in metafields.cross %}
+    {% assign featured = all_products[crossselling[1]] %}
+    <div class="grid__item">
+  	 <a href="/products/{{ featured.handle }}" class="grid-link text-center">
+      <span class="grid-link__image">
+        <span class="grid-link__image-centered">
+          {% capture featured_img_id %}related-{{ featured.featured_image.id }}{% endcapture %}
+          {%- assign featured_img_url = featured.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <img id="{{ featured_img_id }}"
+               alt="{{ featured.featured_image.alt | escape }}"
+               class="product__img lazyload"
+               data-src="{{ featured_img_url }}"
+               data-widths="[150, 220, 360, 470, 600, 750, 940, 1080, 1296, 1512, 1728, 2048]"
+               data-aspectratio="{{ featured.featured_image.aspect_ratio }}"
+               data-sizes="auto"
+               data-image>
+        </span>
+      </span>
+      <div class="grid-link__content">
+      	<p class="grid-link__title">{{ featured.title }}</p>
+      	<p class="grid-link__meta">
+          {{ featured.price | money }}
+      	</p>
+      </div>
+  	 </a>
+    </div>
+    
+  {% endfor %}
+  </div>
+{% endif %}
